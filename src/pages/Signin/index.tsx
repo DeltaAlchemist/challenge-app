@@ -5,14 +5,12 @@ import { useNavigation } from '@react-navigation/native';
 import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const schema = yup.object({
   email: yup.string().email('Email inválido').required('Informe seu email'),
   password: yup.string().min(6, 'A senha deve ter pelo menos 6 dígitos').required('Informe sua senha')
 })
 
-const userInfo = { email: 'a@gmail.com', password: '123456'}
 export default function SignIn() {
   const navigation = useNavigation();
 
@@ -25,14 +23,6 @@ export default function SignIn() {
 
   function handleSignIn() {
     navigation.navigate<never>('Profile')
-  }
-
-  async function login() {
-    if (userInfo.email === email && userInfo.password === password) {
-      await AsyncStorage.setItem('isLoggedIn', '1');
-    } else {
-      alert('Dados de login incorretos.')
-    }
   }
 
   return (

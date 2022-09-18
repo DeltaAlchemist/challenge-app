@@ -1,13 +1,28 @@
-import React from 'react'
-import { Text, View, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
+import React, { useEffect, useState } from 'react';
+import { Text, View, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import { BaseDto }  from '../../models/BaseDto';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Profile() {
   const navigation = useNavigation();
+
+  const [user, setUser] = useState({});
+
+  useEffect(() => {
+    async function loadUser() {
+      const userStorage = await AsyncStorage.getItem('user');
+      if (userStorage) {
+        setUser(JSON.parse(userStorage));
+      }
+    }
+    loadUser();
+    
+  }, []);
   
   return (
+    console.log(user),
     <View style={styles.container}>
       <Animatable.View 
         animation='fadeInLeft' 
@@ -18,11 +33,15 @@ export default function Profile() {
       </Animatable.View>
 
       <Animatable.View animation='fadeInUp' style={styles.containerForm}>
-        <Text style={styles.title}>Seu email</Text>
 
-        <Text style={styles.title}>Senha</Text>
+        <Text style={styles.title}>Seu Nome</Text>
+        <Text style={styles.info}>{user.name}</Text>
+
+        <Text style={styles.title}>Seu email</Text>
+        <Text style={styles.info}>{user.email}</Text>
 
         <Text style={styles.title}>Idade</Text>
+        <Text style={styles.info}>{user.age}</Text>
 
       </Animatable.View>
     </View>
@@ -81,6 +100,11 @@ const styles = StyleSheet.create({
     alignSelf: 'center'
   },
   registerText: {
+    color: '#a1a1a1'
+  },
+  info: {
+    marginTop: 10,
+    fontSize: 16,
     color: '#a1a1a1'
   }
 

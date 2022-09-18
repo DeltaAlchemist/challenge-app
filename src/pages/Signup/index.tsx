@@ -1,18 +1,14 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Text, View, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
 import * as Animatable from 'react-native-animatable';
-import { BaseDto }  from '../../models/BaseDto';
 import { useNavigation } from '@react-navigation/native';
 import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-
-const emailState: BaseDto = {
-    value: ''
-}
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const schema = yup.object({
-  email: yup.string().email('Email inválido').required('Informe seu email'),
+  email: yup.string().required('Informe seu email'),
   password: yup.string().min(6, 'A senha deve ter pelo menos 6 dígitos').required('Informe sua senha'),
   name: yup.string().max(20, 'Nome muito longo!').required('Insira um nome, por favor.')
 })
@@ -23,15 +19,26 @@ export default function SignUp() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [age, setAge] = useState('');
+  const [name, setName] = useState('');
 
   const { control, handleSubmit, formState: { errors }} = useForm({
     resolver: yupResolver(schema)
   })
 
+  async function saveUser() {
+    await AsyncStorage.setItem('user', JSON.stringify({
+      'email': email,
+      'password': password,
+      'age': age,
+      'name': name
+    }))
+  }
+
   function handleSignUp() {
+    saveUser();
     navigation.navigate<never>('Profile');
   }
-  
+
   return (
     <View style={styles.container}>
       <Animatable.View 
@@ -50,7 +57,10 @@ export default function SignUp() {
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
               value={value}
-              onChangeText={onChange}
+              onChangeText={(text) => {
+                onChange(parseInt(text))
+                setEmail(text)
+              }}
               onBlur={onBlur}
               placeholder='Digite um email...'
               style={[
@@ -70,7 +80,10 @@ export default function SignUp() {
           render={({ field: { onChange, onBlur, value }}) => (
             <TextInput 
               value={value}
-              onChangeText={onChange}
+              onChangeText={(text) => {
+                onChange(parseInt(text))
+                setPassword(text)
+              }}
               onBlur={onBlur}
               placeholder='Sua senha'
               secureTextEntry={true}
@@ -85,12 +98,25 @@ export default function SignUp() {
         {errors.password && <Text style={styles.labelError}>{errors.password?.message?.toString()}</Text>}
 
         <Text style={styles.title}>Idade</Text>
-        <TextInput 
-          placeholder='Digite sua idade...'
-          keyboardType='numeric'
-          maxLength={2}
-          style={styles.input}
+        <Controller 
+          control={control}
+          name="age"
+          render={({ field: { onChange, onBlur, value }}) => (
+            <TextInput
+              value={value}
+              onChangeText={(text) => {
+                onChange(parseInt(text))
+                setAge(text)
+              }}
+              onBlur={onBlur}
+              placeholder='Digite sua idade...'
+              keyboardType='numeric'
+              maxLength={2}
+              style={styles.input}
+            />
+          )}
         />
+        
         
         <Text style={styles.title}>Nome</Text>
         <Controller 
@@ -99,7 +125,10 @@ export default function SignUp() {
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
               value={value}
-              onChangeText={onChange}
+              onChangeText={(text) => {
+                onChange(parseInt(text))
+                setName(text)
+              }}
               onBlur={onBlur}
               placeholder='Como você prefere ser chamado(a)? ...'
               style={[
