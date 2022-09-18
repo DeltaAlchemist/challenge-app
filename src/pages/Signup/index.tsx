@@ -22,6 +22,10 @@ export default function SignUp() {
   const { control, handleSubmit, formState: { errors }} = useForm({
     resolver: yupResolver(schema)
   })
+
+  function handleSignUp() {
+    navigation.navigate<never>('Profile');
+  }
   
   return (
     <View style={styles.container}>
@@ -83,7 +87,7 @@ export default function SignUp() {
           style={styles.input}
         />
 
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate<never>('Profile')}>
+        <TouchableOpacity style={styles.button} onPress={handleSubmit(handleSignUp)}>
           <Text style={styles.buttonText}>Cadastrar</Text>
         </TouchableOpacity>
 
@@ -120,9 +124,11 @@ const styles = StyleSheet.create({
     marginTop: 28
   },
   input: {
+    width: '100%',
     borderBottomWidth: 1,
     height: 40,
     marginBottom: 12,
+    paddingHorizontal: 8,
     fontSize: 16
   },
   button: {
