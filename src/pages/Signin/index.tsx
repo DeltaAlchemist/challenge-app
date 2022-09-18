@@ -1,18 +1,23 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Text, View, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
 import * as Animatable from 'react-native-animatable';
 import { useNavigation } from '@react-navigation/native';
 import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const schema = yup.object({
   email: yup.string().email('Email inválido').required('Informe seu email'),
   password: yup.string().min(6, 'A senha deve ter pelo menos 6 dígitos').required('Informe sua senha')
 })
 
+const userInfo = { email: 'a@gmail.com', password: '123456'}
 export default function SignIn() {
   const navigation = useNavigation();
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const { control, handleSubmit, formState: { errors }} = useForm({
     resolver: yupResolver(schema)
@@ -20,6 +25,14 @@ export default function SignIn() {
 
   function handleSignIn() {
     navigation.navigate<never>('Profile')
+  }
+
+  async function login() {
+    if (userInfo.email === email && userInfo.password === password) {
+      await AsyncStorage.setItem('isLoggedIn', '1');
+    } else {
+      alert('Dados de login incorretos.')
+    }
   }
 
   return (
@@ -40,7 +53,10 @@ export default function SignIn() {
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
               value={value}
-              onChangeText={onChange}
+              onChangeText={(text) => {
+                onChange(parseInt(text))
+                setEmail(text)
+              }}
               onBlur={onBlur}
               placeholder='Digite um email...'
               style={[
@@ -60,7 +76,10 @@ export default function SignIn() {
           render={({ field: { onChange, onBlur, value }}) => (
             <TextInput 
               value={value}
-              onChangeText={onChange}
+              onChangeText={(text) => {
+                onChange(parseInt(text))
+                setPassword(text)
+              }}
               onBlur={onBlur}
               placeholder='Sua senha'
               secureTextEntry={true}
