@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Text, View, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
 import * as Animatable from 'react-native-animatable';
 import { BaseDto }  from '../../models/BaseDto';
@@ -13,11 +13,16 @@ const emailState: BaseDto = {
 
 const schema = yup.object({
   email: yup.string().email('Email inválido').required('Informe seu email'),
-  password: yup.string().min(6, 'A senha deve ter pelo menos 6 dígitos').required('Informe sua senha')
+  password: yup.string().min(6, 'A senha deve ter pelo menos 6 dígitos').required('Informe sua senha'),
+  name: yup.string().max(20, 'Nome muito longo!').required('Insira um nome, por favor.')
 })
 
 export default function SignUp() {
   const navigation = useNavigation();
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [age, setAge] = useState('');
 
   const { control, handleSubmit, formState: { errors }} = useForm({
     resolver: yupResolver(schema)
@@ -37,7 +42,7 @@ export default function SignUp() {
         <Text style={styles.message}>Cadastre-se</Text>
       </Animatable.View>
 
-            <Animatable.View animation='fadeInUp' style={styles.containerForm}>
+        <Animatable.View animation='fadeInUp' style={styles.containerForm}>
         <Text style={styles.title}>Email</Text>
         <Controller 
           control={control}
@@ -86,6 +91,26 @@ export default function SignUp() {
           maxLength={2}
           style={styles.input}
         />
+        
+        <Text style={styles.title}>Nome</Text>
+        <Controller 
+          control={control}
+          name="name"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              value={value}
+              onChangeText={onChange}
+              onBlur={onBlur}
+              placeholder='Como você prefere ser chamado(a)? ...'
+              style={[
+                styles.input, {
+                  borderWidth: errors.name && 1,
+                  borderColor: errors.name && '#ff375b'
+              }]}
+            />
+          )}
+        />
+        {errors.name && <Text style={styles.labelError}>{errors.name?.message?.toString()}</Text>}
 
         <TouchableOpacity style={styles.button} onPress={handleSubmit(handleSignUp)}>
           <Text style={styles.buttonText}>Cadastrar</Text>
