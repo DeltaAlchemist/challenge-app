@@ -18,8 +18,8 @@ export default function SignIn() {
     resolver: yupResolver(schema)
   })
 
-  function handleSignIn(data: Object) {
-    console.log(data);
+  function handleSignIn() {
+    navigation.navigate<never>('Profile')
   }
 
   return (
